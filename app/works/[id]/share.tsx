@@ -1,11 +1,19 @@
 import { useState } from "react";
-import { View, Text, useWindowDimensions, Pressable, Platform } from "react-native";
+import {
+  View,
+  Text,
+  useWindowDimensions,
+  Pressable,
+  Platform,
+} from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import { useWorkByIdQuery } from "@/data/hooks/useWorkByIdQuery";
 import { LoadingShade } from "@/components/LoadingShade";
 import * as Sharing from "expo-sharing";
-import ImagePicker, { Image as ImageType } from "react-native-image-crop-picker";
+import ImagePicker, {
+  Image as ImageType,
+} from "react-native-image-crop-picker";
 
 export default function ShareWork() {
   const dimensions = useWindowDimensions();
@@ -14,9 +22,7 @@ export default function ShareWork() {
   const [croppedImage, setCroppedImage] = useState<ImageType | null>(null);
 
   async function share() {
-    await Sharing.shareAsync(
-      croppedImage?.path!
-    );
+    await Sharing.shareAsync(croppedImage?.path!);
   }
 
   async function crop() {
@@ -25,14 +31,9 @@ export default function ShareWork() {
       width: 300,
       height: 300,
       mediaType: "photo",
-      includeBase64: true,
     });
     setCroppedImage(image);
   }
-
-  const imagePath = croppedImage
-  ? croppedImage.path
-  : work && work.images.web.url;
 
   return (
     <View className="flex-1 bg-shade-1">
@@ -53,18 +54,18 @@ export default function ShareWork() {
           }}
         >
           <Image
-            source={{ uri: imagePath }}
+            source={{
+              uri: croppedImage
+                ? croppedImage.path
+                : work && work.images.web.url,
+            }}
             style={{ width: "100%", height: "100%" }}
             contentFit="cover"
             transition={500}
           />
         </View>
         <RoundButton onPress={crop} title="Crop" />
-        <RoundButton
-          title="Share"
-          onPress={share}
-          disabled={!croppedImage}
-        />
+        <RoundButton title="Share" onPress={share} disabled={!croppedImage} />
       </View>
       <LoadingShade isLoading={isLoading} />
     </View>
